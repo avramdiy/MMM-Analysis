@@ -12,6 +12,8 @@
 
 ### 2nd Commit
 
+- Removed the 'OpenInt' column and split the dataframe into three periods (1970-01-02 to 2017-11-10) for separate analysis objects.
+
 ### 3rd Commit
 
 ### 4th Commit
