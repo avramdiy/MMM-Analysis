@@ -84,6 +84,26 @@ def plot_avg_volume(df, label):
 	plt.close(fig)
 	return img_base64
 
+def plot_moving_range(df, label):
+	df = df.copy()
+	df['Range'] = df['High'] - df['Low']
+	df['Month'] = df['Date'].dt.month
+	df_oct_nov_dec = df[df['Month'].isin([10, 11, 12])]
+	df_oct_nov_dec = df_oct_nov_dec.sort_values('Date')
+	df_oct_nov_dec['MovingRange'] = df_oct_nov_dec['Range'].rolling(window=90, min_periods=1).mean()
+	fig, ax = plt.subplots()
+	ax.plot(df_oct_nov_dec['Date'], df_oct_nov_dec['MovingRange'])
+	ax.set_title(f'90-Day Moving Range (High-Low) Oct-Dec ({label})')
+	ax.set_xlabel('Date')
+	ax.set_ylabel('90-Day Moving Range')
+	fig.tight_layout()
+	buf = io.BytesIO()
+	fig.savefig(buf, format='png')
+	buf.seek(0)
+	img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+	plt.close(fig)
+	return img_base64
+
 @app.route('/avg_open')
 def avg_open_plot():
 	img1 = plot_avg_open(df1, 'Period 1')
@@ -104,6 +124,19 @@ def avg_volume_plot():
 	img3 = plot_avg_volume(df3, 'Period 3')
 	html = f'''
 		<h1>Average Volume per Month</h1>
+		<h2>Period 1</h2><img src="data:image/png;base64,{img1}"/>
+		<h2>Period 2</h2><img src="data:image/png;base64,{img2}"/>
+		<h2>Period 3</h2><img src="data:image/png;base64,{img3}"/>
+	'''
+	return render_template_string(html)
+
+@app.route('/moving_range_oct_nov_dec')
+def moving_range_plot():
+	img1 = plot_moving_range(df1, 'Period 1')
+	img2 = plot_moving_range(df2, 'Period 2')
+	img3 = plot_moving_range(df3, 'Period 3')
+	html = f'''
+		<h1>90-Day Moving Range (High-Low) for Oct, Nov, Dec</h1>
 		<h2>Period 1</h2><img src="data:image/png;base64,{img1}"/>
 		<h2>Period 2</h2><img src="data:image/png;base64,{img2}"/>
 		<h2>Period 3</h2><img src="data:image/png;base64,{img3}"/>

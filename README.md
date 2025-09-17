@@ -23,3 +23,5 @@
 - Added a Flask route to visualize the average volume per month for all three period objects using matplotlib.
 
 ### 5th Commit
+
+- Added a Flask route to visualize the 90 Day Moving Average from October through December for all three periods.
