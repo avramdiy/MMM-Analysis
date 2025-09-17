@@ -16,6 +16,8 @@
 
 ### 3rd Commit
 
+- Added a Flask route to visualize the average open price per month for all three period objects using matplotlib.
+
 ### 4th Commit
 
 ### 5th Commit
