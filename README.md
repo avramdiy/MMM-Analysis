@@ -20,4 +20,6 @@
 
 ### 4th Commit
 
+- Added a Flask route to visualize the average volume per month for all three period objects using matplotlib.
+
 ### 5th Commit

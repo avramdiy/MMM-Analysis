@@ -1,9 +1,3 @@
-
-import matplotlib.pyplot as plt
-import io
-import base64
-
-
 from flask import Flask, render_template_string
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -76,6 +70,20 @@ def plot_avg_open(df, label):
 	plt.close(fig)
 	return img_base64
 
+def plot_avg_volume(df, label):
+	monthly_avg = df.groupby(df['Date'].dt.to_period('M'))['Volume'].mean()
+	fig, ax = plt.subplots()
+	monthly_avg.plot(ax=ax, title=f'Average Volume per Month ({label})')
+	ax.set_xlabel('Month')
+	ax.set_ylabel('Average Volume')
+	fig.tight_layout()
+	buf = io.BytesIO()
+	fig.savefig(buf, format='png')
+	buf.seek(0)
+	img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+	plt.close(fig)
+	return img_base64
+
 @app.route('/avg_open')
 def avg_open_plot():
 	img1 = plot_avg_open(df1, 'Period 1')
@@ -83,6 +91,19 @@ def avg_open_plot():
 	img3 = plot_avg_open(df3, 'Period 3')
 	html = f'''
 		<h1>Average Open Price per Month</h1>
+		<h2>Period 1</h2><img src="data:image/png;base64,{img1}"/>
+		<h2>Period 2</h2><img src="data:image/png;base64,{img2}"/>
+		<h2>Period 3</h2><img src="data:image/png;base64,{img3}"/>
+	'''
+	return render_template_string(html)
+
+@app.route('/avg_volume')
+def avg_volume_plot():
+	img1 = plot_avg_volume(df1, 'Period 1')
+	img2 = plot_avg_volume(df2, 'Period 2')
+	img3 = plot_avg_volume(df3, 'Period 3')
+	html = f'''
+		<h1>Average Volume per Month</h1>
 		<h2>Period 1</h2><img src="data:image/png;base64,{img1}"/>
 		<h2>Period 2</h2><img src="data:image/png;base64,{img2}"/>
 		<h2>Period 3</h2><img src="data:image/png;base64,{img3}"/>
